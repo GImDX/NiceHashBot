@@ -26,7 +26,8 @@ namespace NHB3
             loadSettings();
         }
 
-        public void loadSettings() {
+        public void loadSettings()
+        {
             String fileName = Path.Combine(Directory.GetCurrentDirectory(), "bot.json");
             if (File.Exists(fileName))
             {
@@ -34,6 +35,12 @@ namespace NHB3
                 this.checkBox1.Checked = saved.reffilOrder;
                 this.checkBox2.Checked = saved.lowerPrice;
                 this.checkBox3.Checked = saved.increasePrice;
+
+                this.HighestPrice.Text = saved.HighestPrice.ToString();
+                this.LowestPrice.Text = saved.LowestPrice.ToString();
+
+                this.IncreaseStepMultiple.Text = saved.IncreaseStepMultiple.ToString();
+                this.LowerStepMultiple.Text = saved.LowerStepMultiple.ToString();
             }
         }
 
@@ -57,16 +64,30 @@ namespace NHB3
             if (this.checkBox2.Checked) current.lowerPrice = true;
             if (this.checkBox3.Checked) current.increasePrice = true;
 
+            current.HighestPrice = float.Parse(this.HighestPrice.Text);
+            current.LowestPrice = float.Parse(this.LowestPrice.Text);
+
+            current.IncreaseStepMultiple = float.Parse(this.IncreaseStepMultiple.Text);
+            current.LowerStepMultiple = float.Parse(this.LowerStepMultiple.Text);
+
             return current;
         }
-    }
 
-    public class BotSettings
-    {
-        public bool reffilOrder { get; set; }
+        public class BotSettings
+        {
+            public bool reffilOrder { get; set; }
 
-        public bool lowerPrice { get; set; }
+            public bool lowerPrice { get; set; }
 
-        public bool increasePrice { get; set; }
+            public bool increasePrice { get; set; }
+
+            public float HighestPrice { get; set; }
+
+            public float LowestPrice { get; set; }
+
+            public float IncreaseStepMultiple { get; set; }
+
+            public float LowerStepMultiple { get; set; }
+        }
     }
 }

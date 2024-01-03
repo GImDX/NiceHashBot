@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static NHB3.ApiConnect;
+using static NHB3.BotForm;
 
 namespace NHB3
 {
@@ -248,14 +249,23 @@ namespace NHB3
                         float price_step_down = float.Parse("" + algo["priceDownStep"], CultureInfo.InvariantCulture);
 
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("?adjust price?; order {0}, speed {1}, rigs {2}, price {3}, step_down {4}", order["id"], order_speed, rigs_count, order_price, price_step_down);
+                        Console.WriteLine("?adjust price?; order {0}, speed {1}, rigs {2}, price {3}, step_down {4}, HighestPrice {5}, LowestPrice {6}, IncreaseStepMultiple {7}, LowerStepMultiple {8} ", order["id"], order_speed, rigs_count, order_price, price_step_down, saved.HighestPrice, saved.LowestPrice, saved.IncreaseStepMultiple, saved.LowerStepMultiple);
 
-                        if (saved.increasePrice && (order_speed == 0 || rigs_count == 0)) {
-                            float new_price = (float)Math.Round(order_price + (price_step_down * -1), 4);
+                        if (order_price > saved.HighestPrice) {
+                            Console.WriteLine("price {0} >  HighestPrice {1}, NO increasePrice", order_price, saved.HighestPrice);
+                        }
+
+                        if (order_price < saved.LowestPrice)
+                        {
+                            Console.WriteLine("price {0} <  LowestPrice {1}, NO lowerPrice", order_price, saved.LowestPrice);
+                        }
+
+                        if (saved.increasePrice && (order_speed == 0 || rigs_count == 0) && (order_price < saved.HighestPrice)) {
+                            float new_price = (float)Math.Round(order_price + (price_step_down * -1 * saved.IncreaseStepMultiple), 4);
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.WriteLine("===> price up order to {0}", new_price);
                             ac.updateOrder("" + order["algorithm"]["algorithm"], "" + order["id"], new_price.ToString(new CultureInfo("en-US")), "" + order["limit"]);
-                        } else if (saved.lowerPrice && (order_speed > 0 || rigs_count > 0)) {
+                        } else if (saved.lowerPrice && (order_speed > 0 || rigs_count > 0) && (order_price > saved.LowestPrice)) {
                             Dictionary<string, float> market = getOrderPriceRangesForAlgoAndMarket("" + order["algorithm"]["algorithm"], "" + order["market"]);
                             var list = market.Keys.ToList();
                             list.Sort();
@@ -271,7 +281,7 @@ namespace NHB3
                             }
 
                             if (idx > 1) {
-                                float new_price = (float)Math.Round(order_price + price_step_down, 4);
+                                float new_price = (float)Math.Round(order_price + price_step_down * saved.LowerStepMultiple, 4);
                                 Console.ForegroundColor = ConsoleColor.Yellow;
                                 Console.WriteLine("===> price down order to {0}", new_price);
                                 ac.updateOrder("" + order["algorithm"]["algorithm"], "" + order["id"], new_price.ToString(new CultureInfo("en-US")), "" + order["limit"]);
