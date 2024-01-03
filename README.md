@@ -1,4 +1,9 @@
 # NiceHashBot
+
+This is a fork of NHB, add High/Low price limit and stepsize confiuration.
+Tips appreciated:
+- [@GImDX](https://github.com/GImDX): `Bitcoin:3JaFV84odmU43pNikSWqzRbfnb6T3mhUDs`
+
 NHB3 bot for automatic order management.
 
 - [Features](#features)
